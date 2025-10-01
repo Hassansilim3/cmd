@@ -17,7 +17,7 @@ let userData = {
 };
 
 // APIs base URL
-const API_BASE = 'https://commandobot.pythonanywhere.com/api';
+const API_BASE = 'https://cmd-pearl.vercel.app/api';
 
 // تحميل الإعدادات
 async function loadSettings() {
