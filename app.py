@@ -130,8 +130,7 @@ def send_message_to_user_with_reply_markup(user_id, text, reply_markup):
 def init_db():
     conn = sqlite3.connect(module_dir+os.sep+'bot.db', check_same_thread=False)
     cursor = conn.cursor()
-
-    # جدول المستخدمين
+com # جدول المستخدمين
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
@@ -424,11 +423,11 @@ def telegram_webhook():
         add_user_temp(user_id, username, first_name, last_name=last_name, invitor=invitor)
 
     if (text == '/admin') and (user_id == ADMIN_ID):
-        reply_text = f"لوحة التحكم :\nhttps://commandobot.pythonanywhere.com/admin/panel?key={KEY}\nقاعدة البيانات :\nhttps://commandobot.pythonanywhere.com/admin/users?key={KEY}"
+        reply_text = f"لوحة التحكم :\nhttps://cmd-pearl.vercel.app/admin/panel?key={KEY}\nقاعدة البيانات :\nhttps://cmd-pearl.vercel.app/admin/users?key={KEY}"
         send_message_to_user(user_id, reply_text)
     else:
         # ✅ إرسال زر Web App للمستخدم دائمًا
-        web_app_url = "https://commandobot.pythonanywhere.com"  # استبدل برابطك
+        web_app_url = "https://cmd-pearl.vercel.app"  # استبدل برابطك
         keyboard = [
             [
                 InlineKeyboardButton(
