@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMMANDO Bot - تطبيق الربح من مشاهدة الإعلانات</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <script src='//libtl.com/sdk.js' data-zone='9800891' data-sdk='show_9800891'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="header">
+                <h1>COMMANDO</h1>
+                <p class="subtitle">منصة الربح الأولى من مشاهدة الإعلانات ومشاركة الأصدقاء</p>
+                <div class="balance-card shine">
+                    <div class="balance-title">رصيدك الحالي</div>
+                    <div class="balance-amount" id="userBalance">0 CMD</div>
+                    <div id="homeMinWithdrawText" class="balance-subtitle">1 CMD = 0.005 USDT | يمكنك السحب عند الوصول إلى 15 CMD</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card shine">
+                    <div class="stat-title">المدعوون</div>
+                    <div class="stat-value" id="inviteCount">0</div>
+                </div>
+                <div class="stat-card shine">
+                    <div class="stat-title">الإعلانات اليوم</div>
+                    <div class="stat-value" id="adsToday">0/50</div>
+                </div>
+                <div class="stat-card shine">
+                    <div class="stat-title">المستوى</div>
+                    <div class="stat-value" id="userLevel">1</div>
+                </div>
+                <div class="stat-card shine">
+                    <div class="stat-title">النقاط</div>
+                    <div class="stat-value" id="userPoints">0</div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card shine" onclick="showPage('withdraw')">
+                    <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="feature-title">السحب</div>
+                </div>
+                <div class="feature-card shine" onclick="showPage('invite')">
+                    <div class="feature-icon"><i class="fas fa-user-plus"></i></div>
+                    <div class="feature-title">رابط الدعوة</div>
+                </div>
+                <div class="feature-card shine" onclick="showPage('leaderboard')">
+                    <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="feature-title">المتصدرين</div>
+                </div>
+                <div class="feature-card shine" onclick="showModal('infoModal')">
+                    <div class="feature-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="feature-title">معلومات</div>
+                </div>
+                <div class="feature-card shine" onclick="showModal('partnershipModal')">
+                    <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="feature-title">شراكة</div>
+                </div>
+                <div class="feature-card shine" onclick="showPage('games')">
+                    <div class="feature-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="feature-title">ألعاب</div>
+                </div>
+                <div class="feature-card shine" style="position: relative;">
+                    <div class="soon-badge">قريباً</div>
+                    <div class="feature-icon"><i class="fas fa-gift"></i></div>
+                    <div class="feature-title">الجوائز</div>
+                </div>
+            </div>
+
+            <div class="feature-highlight">
+                <div class="feature-highlight-title">كيفية الربح من COMMANDO</div>
+                <div class="feature-highlight-content">
+                    يمكنك الربح من خلال مشاهدة الإعلانات حيث تحصل على 0.10 CMD لكل إعلان، أو من خلال دعوة الأصدقاء حيث تحصل على 3 CMD لكل صديق يدخل عبر رابطك.
+                </div>
+            </div>
+
+            <div class="animation-container">
+                <div class="animated-icon"><i class="fas fa-star"></i></div>
+                <p>ابدأ رحلتك للربح الآن وانضم إلى آلاف المستخدمين الناجحين</p>
+            </div>
+        </div>
+
+        <!-- صفحة المهام -->
+        <div id="tasks" class="page">
+            <div class="header">
+                <h1>المهام اليومية</h1>
+                <p class="subtitle">أكمل المهام اليومية لزيادة أرباحك</p>
+            </div>
+
+            <div id="tasksContainer">
+                <div class="loading-message">جاري تحميل المهام...</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-header">
+                    <div class="task-title"><i class="fas fa-ad"></i> مشاهدة الإعلانات</div>
+                    <div class="task-reward">0.10 <i class="fas fa-coins"></i></div>
+                </div>
+                <div class="task-description">
+                    شاهد الإعلانات واكسب 0.10 CMD لكل إعلان. يمكنك مشاهدة حتى 50 إعلان يومياً.
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="adsProgress" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text" id="adsProgressText">0/50 إعلان</div>
+               <button class="btn btn-primary" onclick="watchAd()">
+    <i class="fas fa-play"></i> مشاهدة إعلان
+</button>
+            </div>
+
+            <div class="task-item">
+                <div class="task-header">
+                    <div class="task-title"><i class="fas fa-user-plus"></i> دعوة الأصدقاء</div>
+                    <div class="task-reward">3.00 <i class="fas fa-coins"></i></div>
+                </div>
+                <div class="task-description">
+                    ادعُ أصدقائك عبر رابط الدعوة الخاص بك واحصل على 3 CMD لكل صديق ينضم.
+                </div>
+                <button class="btn btn-primary" onclick="showPage('invite')">
+                    <i class="fas fa-user-plus"></i> الذهاب إلى صفحة الدعوة
+                </button>
+            </div>
+        </div>
+
+        <!-- صفحة الألعاب -->
+        <div id="games" class="page">
+            <div class="header">
+                <h1>الألعاب</h1>
+                <p class="subtitle">العب واكسب نقاط إضافية</p>
+            </div>
+
+            <!-- لعبة كومبو -->
+            <div class="game-container">
+                <div id="game-main-page">
+                    <div class="game-menu-box">
+                        <div class="game-menu-content">
+                            <div class="game-menu-icon">🔥</div>
+                            <div class="game-menu-text">لعبة كومبو</div>
+                            <button id="game-play-button" class="game-menu-button" onclick="startComboGame()">ابدأ اللعب</button>
+                        </div>
+                    </div>
+
+                    <div id="game-time-message" class="game-time-message"></div>
+
+                    <div class="game-info-box">
+                        <h3>كيفية اللعب:</h3>
+                        <p>اختر 3 صور متطابقة من بين المجموعات لتربح نقطة! يمكنك اللعب مرة واحدة كل 24 ساعة.(تجربي)</p>
+                    </div>
+                </div>
+
+                <div id="game-page" style="display: none;">
+                    <div class="game-back-btn" onclick="goBackFromGame()">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="game-score">النقاط: <span id="game-score">0</span></div>
+                    
+                    <div class="game-boxes-container">
+                        <div class="game-box" id="game-chosen1">1</div>
+                        <div class="game-box" id="game-chosen2">2</div>
+                        <div class="game-box" id="game-chosen3">3</div>
+                    </div>
+                    
+                    <div class="game-button-bar">
+                        <button class="game-btn" onclick="showGameContent(1)">المجموعة 1</button>
+                        <button class="game-btn" onclick="showGameContent(2)">المجموعة 2</button>
+                        <button class="game-btn" onclick="showGameContent(3)">المجموعة 3</button>
+                        <button class="game-btn" onclick="showGameContent(4)">المجموعة 4</button>
+                        <button class="game-btn" onclick="showGameContent(5)">المجموعة 5</button>
+                    </div>
+                    
+                    <div id="game-content1" class="game-content-box"></div>
+                    <div id="game-content2" class="game-content-box"></div>
+                    <div id="game-content3" class="game-content-box"></div>
+                    <div id="game-content4" class="game-content-box"></div>
+                    <div id="game-content5" class="game-content-box"></div>
+                    
+                    <div id="game-result-message" class="game-result-message"></div>
+                </div>
+            </div>
+
+            <!-- ألعاب أخرى قريباً -->
+            <div class="game-coming-soon">
+                <div class="soon-badge">قريباً</div>
+                <p>ألعاب جديدة قادمة قريباً!</p>
+            </div>
+        </div>
+
+        <!-- صفحة الدعوة -->
+        <div id="invite" class="page">
+            <div class="header">
+                <h1>دعوة الأصدقاء</h1>
+                <p class="subtitle">ادعُ أصدقائك واكسب 3 CMD لكل صديق</p>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-title">عدد المدعوين</div>
+                <div class="balance-amount" id="totalInvites">0</div>
+                <div class="balance-subtitle">كلما دعت المزيد من الأصدقاء، زادت أرباحك</div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">رابط الدعوة الخاص بك</div>
+                <div class="form-input" id="inviteLink" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    جاري تحميل الرابط...
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="copyInviteLink()">
+                <i class="fas fa-copy"></i> نسخ الرابط
+            </button>
+
+            <h2 class="section-title" style="margin-top: 40px;">إحالاتك</h2>
+            <div class="info-box">
+                <div class="info-box-content">
+                    <p>هذه قائمة بجميع المستخدمين الذين انضموا عبر رابط الدعوة الخاص بك.</p>
+                    <div id="referralsList" style="margin-top: 15px; max-height: 300px; overflow-y: auto;">
+                        <div style="text-align: center; color: var(--light-text); padding: 20px;">جارٍ تحميل قائمة الإحالات...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="animation-container">
+                <div class="animated-icon"><i class="fas fa-users"></i></div>
+                <p>ابدأ بدعوة أصدقائك الآن واشاهد أرباحك تنمو</p>
+            </div>
+        </div>
+
+        <!-- صفحة السحب -->
+        <div id="withdraw" class="page">
+            <div class="header">
+                <h1>سحب الأرباح</h1>
+                <p class="subtitle">اسحب أرباحك إلى محفظتك</p>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-title">رصيدك المتاح للسحب</div>
+                <div class="balance-amount" id="withdrawBalance">0 CMD</div>
+                <div id="withdrawMinWithdrawText" class="balance-subtitle">الحد الأدنى للسحب هو 15 CMD (0.15 USDT)</div>
+            </div>
+
+            <h2 class="section-title">اختر طريقة السحب</h2>
+
+            <div class="withdraw-methods-grid" id="withdrawMethods">
+                <div style="text-align: center; color: var(--light-text); padding: 20px;">جارٍ تحميل وسائل الدفع...</div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label" id="withdrawDetailsLabel">رقم المحفظة</div>
+                <input type="text" class="form-input" id="withdrawAddress" placeholder="أدخل رقم المحفظة">
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">المبلغ المطلوب سحبه (CMD)</div>
+                <input type="number" class="form-input" id="withdrawAmount" placeholder="أدخل المبلغ" step="0.005">
+                <div class="balance-subtitle" id="usdtEquivalent">0.00 USDT</div>
+            </div>
+
+            <button class="btn btn-primary" onclick="processWithdrawal()">
+                <i class="fas fa-paper-plane"></i> تأكيد السحب
+            </button>
+
+            <div class="animation-container">
+                <div class="animated-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <p>استمتع بأرباحك واستمر في جني المزيد</p>
+            </div>
+        </div>
+
+        <!-- صفحة المتصدرين -->
+        <div id="leaderboard" class="page">
+            <div class="header">
+                <h1>المتصدرين</h1>
+                <p class="subtitle">أفضل اللاعبين حسب الأرباح</p>
+            </div>
+
+            <div class="top-three" id="topThree">
+            </div>
+
+            <h2 class="section-title">قائمة المتصدرين</h2>
+
+            <div id="leaderboardList">
+            </div>
+
+            <div class="animation-container">
+                <div class="animated-icon"><i class="fas fa-trophy"></i></div>
+                <p>استمر في العمل لترى اسمك في قائمة المتصدرين</p>
+            </div>
+        </div>
+
+        <!-- صفحة الاشتراك في القنوات -->
+        <div id="channels" class="page">
+            <div class="header">
+                <h1>الاشتراك في القنوات</h1>
+                <p class="subtitle">يجب عليك الاشتراك في القنوات أدناه لتفعيل حسابك والبدء في الربح</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-content">
+                    <p>يرجى الضغط على كل قناة والاشتراك فيها. بعد الاشتراك، اضغط على زر "تم الاشتراك" للتحقق من عضويتك.</p>
+                    <p class="info-message">لن تتمكن من استخدام التطبيق حتى تكمل الاشتراك في جميع القنوات المطلوبة.</p>
+                </div>
+            </div>
+
+            <div id="channelsList">
+            </div>
+
+            <button class="btn btn-secondary" onclick="window.location.reload()" style="margin-top: 10px;">
+                <i class="fas fa-check-circle"></i> تم الاشتراك
+            </button>
+
+            <div class="animation-container">
+                <div class="animated-icon"><i class="fas fa-check-double"></i></div>
+                <p>بعد الاشتراك، اضغط على "تم الاشتراك" للتحقق ثم انتقل إلى الصفحة الرئيسية</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" id="BottomNavigation">
+        <div class="nav-container">
+            <div class="nav-item active" onclick="showPage('home')">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <div class="nav-label">الرئيسية</div>
+            </div>
+            <div class="nav-item" onclick="showPage('tasks')">
+                <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                <div class="nav-label">المهام</div>
+            </div>
+            <div class="nav-item" onclick="showPage('invite')">
+                <div class="nav-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="nav-label">الدعوة</div>
+            </div>
+            <div class="nav-item" onclick="showPage('withdraw')">
+                <div class="nav-icon"><i class="fas fa-wallet"></i></div>
+                <div class="nav-label">السحب</div>
+            </div>
+            <div class="nav-item" onclick="showPage('leaderboard')">
+                <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                <div class="nav-label">المتصدرين</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-close" onclick="closeModal('infoModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="modal-title">معلومات عن COMMANDO</div>
+            </div>
+            <div class="info-box-content">
+                <p>COMMANDO هو منصة ربح من خلال مشاهدة الإعلانات ودعوة الأصدقاء. تم تطويره ليمكن المستخدمين من تحقيق دخل إضافي بسهولة.</p>
+                <ul>
+                    <li>مشاهدة الإعلانات: 0.10 CMD لكل إعلان</li>
+                    <li>دعوة الأصدقاء: 3 CMD لكل صديق</li>
+                    <li id="infoMinWithdrawText">سحب الأرباح: عند الوصول إلى 15 CMD</li>
+                    <li>متوافق مع جميع الأجهزة</li>
+                    <li>مدفوعات سريعة وآمنة</li>
+                </ul>
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal('infoModal')">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
+        </div>
+    </div>
+
+    <div id="partnershipModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-close" onclick="closeModal('partnershipModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="modal-title">برنامج الشراكة</div>
+            </div>
+            <div class="info-box-content">
+                <p>انضم إلى برنامج الشراكة الخاص بنا واكسب عمولة على كل مستخدم يجلبيه البرنامج.</p>
+                <ul>
+                    <li>عمولة 20% على أرباح المستخدمين الذين تجلبهم</li>
+                    <li>تقارير مفصلة عن أداء الشركاء</li>
+                    <li>دفع أسبوعي للعمولات (TON 2)</li>
+                    <li>دعم فني مخصص للشركاء</li>
+                </ul>
+                <p>للانضمام إلى برنامج الشراكة، يرجى ملء النموذج أدناه:</p>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">اسم القناة</div>
+                <input type="text" class="form-input" id="channelName" placeholder="أدخل اسم قناتك">
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">رابط القناة</div>
+                <input type="text" class="form-input" id="channelLink" placeholder="https://t.me/yourchannel">
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">وصف القناة</div>
+                <textarea class="form-input" id="channelDescription" placeholder="أدخل وصفاً لقناتك" rows="3"></textarea>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitPartnershipRequest()">
+                <i class="fas fa-paper-plane"></i> تقديم طلب الشراكة
+            </button>
+
+            <button class="btn btn-secondary" onclick="closeModal('partnershipModal')">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم الإدارية - COMMANDO</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .action-section {
+      display: none;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 1px solid #dee2e6;
+    }
+    .action-section.active {
+      display: block;
+    }
+    .stats-grid, .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .stat-card, .user-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #007bff;
+    }
+    /* ✅ تم تغيير لون عناصر <p> داخل الإحصائيات */
+    .stat-card p {
+      color: #28a745; /* لون أخضر */
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .user-card h4 {
+      margin: 0 0 10px 0;
+      color: #28a745;
+    }
+    textarea, input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button.danger {
+      background: #dc3545;
+    }
+    button.danger:hover {
+      background: #c82333;
+    }
+    button.success {
+      background: #28a745;
+    }
+    button.success:hover {
+      background: #218838;
+    }
+    .loading {
+      text-align: center;
+      color: #6c757d;
+    }
+    /* ✅ أنماط جديدة لتحسين وضوح النص في الأقسام */
+    .action-section h2,
+    .action-section h3,
+    .action-section label,
+    .action-section p,
+    .action-section option,
+    .action-section input,
+    .action-section select,
+    .action-section button {
+        color: #2d3748; /* لون نص داكن لتحسين الوضوح */
+    }
+
+    /* تأكد أن خلفية الحقول فاتحة */
+    .action-section input,
+    .action-section select,
+    .action-section textarea {
+        background-color: #ffffff;
+        color: #2d3748;
+    }
+
+    /* تحسين ظهور زر الحذف */
+    button.danger {
+        color: white; /* تأكد أن لون النص أبيض داخل الزر الأحمر */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-shield-alt"></i> لوحة التحكم الإدارية</h1>
+      <p class="subtitle">إدارة النظام، المستخدمين، المهام، والإحصائيات</p>
+    </div>
+
+    <div class="admin-grid">
+      <div class="admin-card" onclick="showSection('broadcast-section')">
+        <div class="admin-card-icon"><i class="fas fa-bullhorn"></i></div>
+        <div class="admin-card-title">إرسال رسالة جماعية</div>
+      </div>
+      <div class="admin-card" onclick="showSection('ban-section')">
+        <div class="admin-card-icon"><i class="fas fa-ban"></i></div>
+        <div class="admin-card-title">حظر / فك حظر مستخدم</div>
+      </div>
+      <div class="admin-card" onclick="showSection('stats-section')">
+        <div class="admin-card-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="admin-card-title">عرض الإحصائيات</div>
+      </div>
+      <div class="admin-card" onclick="showSection('tasks-section')">
+        <div class="admin-card-icon"><i class="fas fa-tasks"></i></div>
+        <div class="admin-card-title">إضافة مهمة جديدة</div>
+      </div>
+      <div class="admin-card" onclick="showSection('leaderboard-section')">
+        <div class="admin-card-icon"><i class="fas fa-trophy"></i></div>
+        <div class="admin-card-title">تحديث لوحة المتصدرين</div>
+      </div>
+      <!-- ✅ بطاقة جديدة لتعديل بيانات المستخدم -->
+      <div class="admin-card" onclick="showSection('edit-user-section')">
+        <div class="admin-card-icon"><i class="fas fa-user-edit"></i></div>
+        <div class="admin-card-title">تعديل بيانات مستخدم</div>
+      </div>
+
+            <!-- ✅ بطاقة جديدة لتعديل الإعدادات -->
+      <div class="admin-card" onclick="showSection('required-channels-section');showSection('settings-section')">
+        <div class="admin-card-icon"><i class="fas fa-cog"></i></div>
+        <div class="admin-card-title">تعديل الإعدادات</div>
+      </div>
+      <!-- ✅ بطاقة جديدة لحذف مهمة -->
+      <div class="admin-card" onclick="showSection('delete-task-section')">
+        <div class="admin-card-icon"><i class="fas fa-trash"></i></div>
+        <div class="admin-card-title">حذف مهمة</div>
+      </div>
+
+      <div class="admin-card" onclick="showSection('audit-section')">
+          <div class="admin-card-icon"><i class="fas fa-search"></i></div>
+          <div class="admin-card-title">تدقيق الإحالات</div>
+    </div>
+
+    <!-- ✅ بطاقة جديدة لإدارة القنوات الإجبارية -->
+    <div class="admin-card" onclick="showSection('settings-section');showSection('required-channels-section')">
+      <div class="admin-card-icon"><i class="fas fa-hashtag"></i></div>
+      <div class="admin-card-title">قنوات الاشتراك الإجباري</div>
+    </div>
+
+    </div>
+
+    <!-- قسم الإرسال الجماعي -->
+    <div id="broadcast-section" class="action-section">
+      <h2><i class="fas fa-bullhorn"></i> إرسال رسالة جماعية</h2>
+      <textarea id="broadcastMessage" rows="5" placeholder="اكتب الرسالة التي تريد إرسالها لجميع المستخدمين..."></textarea>
+      <button onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> إرسال الآن</button>
+      <div id="broadcastResult"></div>
+    </div>
+
+    <!-- قسم الحظر وفك الحظر -->
+    <div id="ban-section" class="action-section">
+      <h2><i class="fas fa-user-shield"></i> إدارة حظر المستخدمين</h2>
+      <div>
+        <h3>حظر مستخدم</h3>
+        <input type="number" id="banUserId" placeholder="أدخل معرف المستخدم (ID)">
+        <button class="danger" onclick="banUser()"><i class="fas fa-ban"></i> حظر المستخدم</button>
+      </div>
+      <div style="margin-top: 20px;">
+        <h3>فك حظر مستخدم</h3>
+        <input type="number" id="unbanUserId" placeholder="أدخل معرف المستخدم (ID)">
+        <button class="success" onclick="unbanUser()"><i class="fas fa-check-circle"></i> فك الحظر</button>
+      </div>
+      <div id="banResult"></div>
+    </div>
+
+    <!-- قسم الإحصائيات -->
+    <div id="stats-section" class="action-section">
+      <h2><i class="fas fa-chart-pie"></i> الإحصائيات العامة</h2>
+      <button onclick="loadStats()"><i class="fas fa-sync"></i> تحديث الإحصائيات</button>
+      <div id="statsResult" class="stats-grid">
+        <!-- سيتم ملؤها ديناميكياً -->
+      </div>
+    </div>
+
+    <!-- قسم إضافة المهام -->
+    <div id="tasks-section" class="action-section">
+      <h2><i class="fas fa-plus-circle"></i> إنشاء مهمة جديدة</h2>
+      <input type="text" id="taskTitle" placeholder="عنوان المهمة">
+      <textarea id="taskDescription" rows="3" placeholder="وصف المهمة"></textarea>
+      <input type="number" id="taskReward" placeholder="مكافأة المهمة (CMD)">
+      <input type="text" id="taskChannel" placeholder="رابط القناة (https://t.me/...)">
+      <button onclick="createTask()"><i class="fas fa-save"></i> إنشاء المهمة</button>
+      <div id="taskResult"></div>
+    </div>
+
+    <!-- قسم تحديث المتصدرين -->
+    <div id="leaderboard-section" class="action-section">
+      <h2><i class="fas fa-trophy"></i> تحديث لوحة المتصدرين</h2>
+      <p>هذا الإجراء سيقوم بإعادة حساب قائمة أفضل 20 مستخدم بناءً على رصيدهم الحالي.</p>
+      <button onclick="generateLeaderboard()"><i class="fas fa-redo"></i> تحديث الآن</button>
+      <div id="leaderboardResult"></div>
+    </div>
+
+    <!-- ✅ قسم تعديل بيانات المستخدم -->
+    <div id="edit-user-section" class="action-section">
+      <h2><i class="fas fa-user-edit"></i> تعديل بيانات مستخدم</h2>
+      <input type="number" id="editUserId" placeholder="أدخل معرف المستخدم (ID)">
+      <select id="editField">
+        <option value="">-- اختر الحقل للتعديل --</option>
+        <option value="username">username</option>
+        <option value="first_name">first_name</option>
+        <option value="last_name">last_name</option>
+        <option value="balance">balance</option>
+        <option value="invites">invites</option>
+        <option value="ads_watched_today">ads_watched_today</option>
+        <option value="level">level</option>
+        <option value="points">points</option>
+        <option value="is_admin">is_admin</option>
+        <option value="banned">banned</option>
+        <option value="last_ad_watch">last_ad_watch</option>
+        <option value="created_at">created_at</option>
+      </select>
+      <!-- سيتم استبدال هذا الحقل ديناميكياً حسب الحقل المختار -->
+      <div id="valueInputContainer">
+        <input type="text" id="editValue" placeholder="أدخل القيمة الجديدة">
+      </div>
+      <button onclick="updateUserField()"><i class="fas fa-save"></i> تحديث الحقل</button>
+      <div id="editResult"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = 'https://commandobot.pythonanywhere.com/api';
+
+
+   function showSection(sectionId) {
+    // إخفاء جميع الأقسام
+    document.querySelectorAll('.action-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    // إظهار القسم المطلوب
+    const targetSection = document.getElementById(sectionId);
+    targetSection.classList.add('active');
+
+    // ✅ تحميل القنوات فقط عند فتح قسم القنوات الإجبارية
+    if (sectionId === 'required-channels-section') {
+        loadRequiredChannels();
+    }
+    // ✅ تحميل الإعدادات فقط عند فتح قسم الإعدادات (بدون القنوات)
+    else if (sectionId === 'settings-section') {
+        loadSettings();
+    }
+    // ✅ تحميل المهام للحذف فقط عند فتح قسم حذف المهام
+    else if (sectionId === 'delete-task-section') {
+        loadTasksForDeletion();
+    }
+}
+
+    // ✅ دالة جديدة لتعديل حقل المستخدم
+    async function updateUserField() {
+      const userId = document.getElementById('editUserId').value.trim();
+      const field = document.getElementById('editField').value;
+      let value = document.getElementById('editValue').value.trim();
+
+      if (!userId || !field || value === '') {
+        alert('الرجاء ملء جميع الحقول.');
+        return;
+      }
+
+      // تحويل القيمة حسب نوع الحقل
+      if (field === 'balance' || field === 'invites' || field === 'ads_watched_today' || field === 'level' || field === 'points') {
+        value = parseFloat(value);
+        if (isNaN(value)) {
+          alert('الرجاء إدخال رقم صحيح لهذا الحقل.');
+          return;
+        }
+      } else if (field === 'is_admin' || field === 'banned') {
+        value = value.toLowerCase() === 'true' || value === '1';
+      }
+      // بالنسبة للتواريخ، نتركها كنص كما هي
+
+      const resultDiv = document.getElementById('editResult');
+      resultDiv.innerHTML = '<p class="loading">جاري تحديث الحقل...</p>';
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/update-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_id: 6434711549,
+            user_id: userId,
+            field: field,
+            value: value
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          resultDiv.innerHTML = `<p style="color: green;">✅ تم تحديث الحقل "${field}" للمستخدم ${userId} بنجاح!</p>`;
+          document.getElementById('editUserId').value = '';
+          document.getElementById('editField').value = '';
+          document.getElementById('editValue').value = '';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل التحديث: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    // ✅ دالة لتغيير نوع حقل الإدخال حسب الحقل المختار
+    document.getElementById('editField').addEventListener('change', function() {
+      const field = this.value;
+      const container = document.getElementById('valueInputContainer');
+      let inputHTML = '';
+
+      if (field === 'balance' || field === 'invites' || field === 'ads_watched_today' || field === 'level' || field === 'points') {
+        inputHTML = `<input type="number" step="any" id="editValue" placeholder="أدخل رقمًا">`;
+      } else if (field === 'is_admin' || field === 'banned') {
+        inputHTML = `
+          <select id="editValue">
+            <option value="true">نعم (True)</option>
+            <option value="false">لا (False)</option>
+          </select>`;
+      } else if (field === 'last_ad_watch' || field === 'created_at') {
+        inputHTML = `<input type="datetime-local" id="editValue" placeholder="اختر التاريخ والوقت">`;
+      } else {
+        inputHTML = `<input type="text" id="editValue" placeholder="أدخل القيمة الجديدة">`;
+      }
+
+      container.innerHTML = inputHTML;
+    });
+
+    async function sendBroadcast() {
+      const msg = document.getElementById('broadcastMessage').value.trim();
+      if (!msg) {
+        alert('الرجاء كتابة رسالة قبل الإرسال.');
+        return;
+      }
+      const resultDiv = document.getElementById('broadcastResult');
+      resultDiv.innerHTML = '<p class="loading">جاري إرسال الرسالة...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/admin/send-broadcast`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: 6434711549, message: msg })
+        });
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = '<p style="color: green;">✅ تم بدء عملية الإرسال الجماعي. ستتلقى إشعارًا عند الانتهاء.</p>';
+          document.getElementById('broadcastMessage').value = '';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل الإرسال: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    async function banUser() {
+      const userId = document.getElementById('banUserId').value.trim();
+      if (!userId) {
+        alert('الرجاء إدخال معرف المستخدم.');
+        return;
+      }
+      const resultDiv = document.getElementById('banResult');
+      resultDiv.innerHTML = '<p class="loading">جاري حظر المستخدم...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/admin/update-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_id: 6434711549,
+            user_id: userId,
+            field: 'banned',
+            value: true
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = `<p style="color: green;">✅ تم حظر المستخدم ذو المعرف ${userId} بنجاح.</p>`;
+          document.getElementById('banUserId').value = '';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل الحظر: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    async function unbanUser() {
+      const userId = document.getElementById('unbanUserId').value.trim();
+      if (!userId) {
+        alert('الرجاء إدخال معرف المستخدم.');
+        return;
+      }
+      const resultDiv = document.getElementById('banResult');
+      resultDiv.innerHTML = '<p class="loading">جاري فك الحظر...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/admin/update-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_id: 6434711549,
+            user_id: userId,
+            field: 'banned',
+            value: false
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = `<p style="color: green;">✅ تم فك حظر المستخدم ذو المعرف ${userId} بنجاح.</p>`;
+          document.getElementById('unbanUserId').value = '';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل فك الحظر: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    async function loadStats() {
+      const resultDiv = document.getElementById('statsResult');
+      resultDiv.innerHTML = '<p class="loading">جاري تحميل الإحصائيات...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/admin/stats?admin_id=6434711549`);
+        const data = await response.json();
+        if (data.success) {
+          const stats = data.stats;
+          resultDiv.innerHTML = `
+            <div class="stat-card">
+              <h3>إجمالي المستخدمين</h3>
+              <p>${stats.total_users}</p>
+            </div>
+            <div class="stat-card">
+              <h3>المستخدمون النشطون اليوم</h3>
+              <p>${stats.active_today}</p>
+            </div>
+            <div class="stat-card">
+              <h3>إجمالي الدعوات</h3>
+              <p>${stats.total_invites}</p>
+            </div>
+            <div class="stat-card">
+              <h3>إجمالي السحوبات</h3>
+              <p>${stats.total_withdrawals} CMD</p>
+            </div>
+            <div class="stat-card">
+              <h3>إعلانات اليوم</h3>
+              <p>${stats.today_ads}</p>
+            </div>
+            <div class="stat-card">
+              <h3>تسجيلات اليوم</h3>
+              <p>${stats.today_signups}</p>
+            </div>
+            <div class="stat-card">
+              <h3>رصيد النظام الكلي</h3>
+              <p>${stats.total_balance} CMD</p>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل تحميل الإحصائيات: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    async function createTask() {
+      const title = document.getElementById('taskTitle').value.trim();
+      const desc = document.getElementById('taskDescription').value.trim();
+      const reward = document.getElementById('taskReward').value.trim();
+      const channel = document.getElementById('taskChannel').value.trim();
+      if (!title || !desc || !reward || !channel) {
+        alert('الرجاء ملء جميع الحقول.');
+        return;
+      }
+      const resultDiv = document.getElementById('taskResult');
+      resultDiv.innerHTML = '<p class="loading">جاري إنشاء المهمة...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/tasks/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title,
+            description: desc,
+            reward: parseFloat(reward),
+            channel: channel
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = `<p style="color: green;">✅ تم إنشاء المهمة "${data.task.title}" بنجاح!</p>`;
+          document.getElementById('taskTitle').value = '';
+          document.getElementById('taskDescription').value = '';
+          document.getElementById('taskReward').value = '';
+          document.getElementById('taskChannel').value = '';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل إنشاء المهمة: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+    async function generateLeaderboard() {
+      const resultDiv = document.getElementById('leaderboardResult');
+      resultDiv.innerHTML = '<p class="loading">جاري تحديث لوحة المتصدرين...</p>';
+      try {
+        const response = await fetch(`${API_BASE}/admin/generate-leaderboard`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: 6434711549 })
+        });
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = '<p style="color: green;">✅ تم بدء عملية تحديث لوحة المتصدرين. سيتم التحديث خلال ثوانٍ.</p>';
+        } else {
+          resultDiv.innerHTML = `<p style="color: red;">❌ فشل بدء التحديث: ${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+      }
+    }
+
+
+        // ✅ دالة جديدة: تحميل الإعدادات الحالية
+    async function loadSettings() {
+        const resultDiv = document.getElementById('settingsResult');
+        try {
+            const response = await fetch('/settings');
+            const settings = await response.json();
+            document.getElementById('minWithdrawal').value = settings.MIN_WITHDRAWAL;
+            // عرض وسائل الدفع
+            let html = '';
+            settings.PAYMENT_METHODS.forEach((method, index) => {
+                html += `
+                    <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <input type="text" value="${method.id}" placeholder="ID" style="width: 48%; margin-right: 2%;" data-field="id" data-index="${index}">
+                        <input type="text" value="${method.name}" placeholder="الاسم" style="width: 48%;" data-field="name" data-index="${index}">
+                        <input type="text" value="${method.icon}" placeholder="الأيقونة (مثال: fas fa-wallet)" style="width: 48%; margin-right: 2%; margin-top: 5px;" data-field="icon" data-index="${index}">
+                        <select style="width: 48%; margin-top: 5px;" data-field="category" data-index="${index}">
+                            <option value="digital" ${method.category === 'digital' ? 'selected' : ''}>محافظ رقمية</option>
+                            <option value="exchange" ${method.category === 'exchange' ? 'selected' : ''}>منصات تداول</option>
+                            <option value="local" ${method.category === 'local' ? 'selected' : ''}>محافظ محلية</option>
+                        </select>
+                        <button onclick="removePaymentMethod(${index})" style="margin-top: 10px; background: #dc3545; padding: 5px 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">حذف</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('paymentMethodsContainer').innerHTML = html;
+        } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في تحميل الإعدادات.</p>`;
+        }
+    }
+
+    // ✅ دالة جديدة: إضافة وسيلة دفع فارغة
+    function addPaymentMethod() {
+        const container = document.getElementById('paymentMethodsContainer');
+        const index = document.querySelectorAll('[data-index]').length; // الترتيب الجديد
+        const newMethodHTML = `
+            <div style="background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #90caf9;">
+                <input type="text" placeholder="ID" style="width: 48%; margin-right: 2%;" data-field="id" data-index="${index}">
+                <input type="text" placeholder="الاسم" style="width: 48%;" data-field="name" data-index="${index}">
+                <input type="text" placeholder="الأيقونة" style="width: 48%; margin-right: 2%; margin-top: 5px;" data-field="icon" data-index="${index}">
+                <select style="width: 48%; margin-top: 5px;" data-field="category" data-index="${index}">
+                    <option value="digital">محافظ رقمية</option>
+                    <option value="exchange">منصات تداول</option>
+                    <option value="local">محافظ محلية</option>
+                </select>
+                <button onclick="removePaymentMethod(${index})" style="margin-top: 10px; background: #dc3545; padding: 5px 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">حذف</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', newMethodHTML);
+    }
+
+    // ✅ دالة جديدة: حذف وسيلة دفع من العرض (ليس من الملف)
+    function removePaymentMethod(index) {
+        const containers = document.querySelectorAll('[data-index]');
+        const targetContainer = Array.from(containers).find(el => el.dataset.index == index);
+        if (targetContainer) {
+            const parent = targetContainer.closest('div[style*="background"]');
+            if (parent) {
+                parent.remove();
+            }
+            // لا حاجة لإعادة ترتيب data-index — نعتمد فقط على القيمة عند الحفظ
+        }
+    }
+
+    // ✅ دالة جديدة: حفظ الإعدادات المعدلة
+    async function saveSettings() {
+        const minWithdrawal = parseFloat(document.getElementById('minWithdrawal').value);
+        if (isNaN(minWithdrawal) || minWithdrawal <= 0) {
+            alert('الرجاء إدخال حد أدنى صالح للسحب.');
+            return;
+        }
+
+        // ✅ جمع بيانات القنوات الإجبارية
+        const channels = [];
+        const channelContainers = document.querySelectorAll('#channelsContainer > div[style*="background"]');
+        channelContainers.forEach(container => {
+            const index = container.querySelector('[data-field="url"]').dataset.index;
+            const urlInput = document.querySelector(`[data-field="url"][data-index="${index}"]`);
+            const titleInput = document.querySelector(`[data-field="title"][data-index="${index}"]`);
+            const descInput = document.querySelector(`[data-field="description"][data-index="${index}"]`);
+            if (urlInput && titleInput && urlInput.value.trim() && titleInput.value.trim()) {
+                channels.push({
+                    url: urlInput.value.trim(),
+                    title: titleInput.value.trim(),
+                    description: descInput?.value.trim() || ''
+                });
+            }
+        });
+
+        // ✅ استخدام Set لتجنب التكرار
+        const seenIds = new Set();
+        const paymentMethods = [];
+        const containers = document.querySelectorAll('[data-index]');
+        containers.forEach(container => {
+            const index = container.dataset.index;
+            const idInput = document.querySelector(`[data-field="id"][data-index="${index}"]`);
+            const nameInput = document.querySelector(`[data-field="name"][data-index="${index}"]`);
+            const iconInput = document.querySelector(`[data-field="icon"][data-index="${index}"]`);
+            const categorySelect = document.querySelector(`[data-field="category"][data-index="${index}"]`);
+            if (idInput && nameInput && iconInput && categorySelect &&
+                idInput.value && nameInput.value && iconInput.value && categorySelect.value) {
+                const methodId = idInput.value.trim();
+                // ✅ تجاهل إذا كان الـ ID مكررًا
+                if (seenIds.has(methodId)) {
+                    return;
+                }
+                seenIds.add(methodId);
+                paymentMethods.push({
+                    id: methodId,
+                    name: nameInput.value.trim(),
+                    icon: iconInput.value.trim(),
+                    category: categorySelect.value
+                });
+            }
+        });
+
+
+        if (paymentMethods.length === 0) {
+            alert('يجب إضافة وسيلة دفع واحدة على الأقل.');
+            return;
+        }
+        const resultDiv = document.getElementById('settingsResult');
+        resultDiv.innerHTML = '<p class="loading">جارٍ حفظ الإعدادات...</p>';
+        try {
+            const response = await fetch(`${API_BASE}/admin/update-settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    admin_id: 6434711549,
+                    MIN_WITHDRAWAL: minWithdrawal,
+                    REQUIRED_CHANNELS: channels, // ✅ تم الإضافة
+                    PAYMENT_METHODS: paymentMethods
+
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                resultDiv.innerHTML = '<p style="color: green;">✅ تم حفظ الإعدادات بنجاح!</p>';
+                // إعادة تحميل الإعدادات لعرض التغييرات
+                loadSettings();
+            } else {
+                resultDiv.innerHTML = `<p style="color: red;">❌ فشل الحفظ: ${data.error}</p>`;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+        }
+    }
+
+    // ✅ دالة جديدة: تحميل قائمة المهام للحذف
+    async function loadTasksForDeletion() {
+        const select = document.getElementById('taskIdToDelete');
+        select.innerHTML = '<option value="">-- جاري التحميل --</option>';
+        try {
+            const response = await fetch(`${API_BASE}/tasks?user_id=0`); // user_id=0 للحصول على كل المهام
+            const data = await response.json();
+            if (data.success) {
+                select.innerHTML = '<option value="">-- اختر مهمة --</option>';
+                data.tasks.forEach(task => {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = `${task.id}: ${task.title}`;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">فشل في تحميل المهام</option>';
+            }
+        } catch (error) {
+            select.innerHTML = '<option value="">خطأ في الاتصال</option>';
+        }
+    }
+
+    // ✅ دالة جديدة: حذف مهمة
+    async function deleteTask() {
+        const taskId = document.getElementById('taskIdToDelete').value;
+        if (!taskId) {
+            alert('الرجاء اختيار مهمة للحذف.');
+            return;
+        }
+        if (!confirm(`هل أنت متأكد أنك تريد حذف المهمة رقم ${taskId}؟ هذه العملية لا رجعة فيها.`)) {
+            return;
+        }
+        const resultDiv = document.getElementById('deleteTaskResult');
+        resultDiv.innerHTML = '<p class="loading">جارٍ حذف المهمة...</p>';
+        try {
+            const response = await fetch(`${API_BASE}/admin/delete-task`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    admin_id: 6434711549,
+                    task_id: parseInt(taskId)
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                resultDiv.innerHTML = `<p style="color: green;">✅ تم حذف المهمة رقم ${taskId} بنجاح!</p>`;
+                // إعادة تحميل قائمة المهام
+                loadTasksForDeletion();
+            } else {
+                resultDiv.innerHTML = `<p style="color: red;">❌ فشل الحذف: ${data.error}</p>`;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+        }
+    }
+
+
+
+
+async function startAudit() {
+  const resultDiv = document.getElementById('auditResult');
+  resultDiv.innerHTML = '<p class="loading">جارٍ بدء عملية التدقيق...</p>';
+  try {
+    const response = await fetch(`${API_BASE}/admin/trigger-audit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ admin_id: 6434711549 })
+    });
+    const data = await response.json();
+    if (data.success) {
+      resultDiv.innerHTML = '<p style="color: green;">✅ تم بدء عملية التدقيق. ستتلقى إشعارًا عند الانتهاء.</p>';
+    } else {
+      resultDiv.innerHTML = `<p style="color: red;">❌ فشل بدء التدقيق: ${data.error}</p>`;
+    }
+  } catch (error) {
+    resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+  }
+}
+
+
+
+// ✅ دالة لتحميل القنوات الإجبارية الحالية
+async function loadRequiredChannels() {
+    const container = document.getElementById('channelsContainer');
+    try {
+        const response = await fetch('/settings');
+        const settings = await response.json();
+        const channels = settings.REQUIRED_CHANNELS || [];
+
+        let html = '';
+        channels.forEach((channel, index) => {
+            html += `
+                <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #dee2e6; position: relative;">
+                    <button onclick="removeRequiredChannel(${index})" style="position: absolute; top: 5px; left: 5px; background: #dc3545; padding: 5px 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">حذف</button>
+                    <input type="text" value="${channel.url}" placeholder="رابط القناة (https://t.me/...)" style="width: 100%; margin-bottom: 10px;" data-field="url" data-index="${index}">
+                    <input type="text" value="${channel.title}" placeholder="عنوان القناة" style="width: 100%; margin-bottom: 10px;" data-field="title" data-index="${index}">
+                    <textarea placeholder="وصف القناة" style="width: 100%; margin-bottom: 10px;" data-field="description" data-index="${index}">${channel.description || ''}</textarea>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = '<p style="color: red;">❌ خطأ في تحميل القنوات الإجبارية.</p>';
+        console.error('Error loading required channels:', error);
+    }
+}
+
+// ✅ دالة لإضافة قناة جديدة فارغة
+function addRequiredChannel() {
+    const container = document.getElementById('channelsContainer');
+    const index = document.querySelectorAll('[data-index]').length;
+    const newChannelHTML = `
+        <div style="background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #90caf9; position: relative;">
+            <button onclick="removeRequiredChannel(${index})" style="position: absolute; top: 5px; left: 5px; background: #dc3545; padding: 5px 10px; border: none; border-radius: 5px; color: white; cursor: pointer;">حذف</button>
+            <input type="text" placeholder="رابط القناة (https://t.me/...)" style="width: 100%; margin-bottom: 10px;" data-field="url" data-index="${index}">
+            <input type="text" placeholder="عنوان القناة" style="width: 100%; margin-bottom: 10px;" data-field="title" data-index="${index}">
+            <textarea placeholder="وصف القناة" style="width: 100%; margin-bottom: 10px;" data-field="description" data-index="${index}"></textarea>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', newChannelHTML);
+}
+
+// ✅ دالة لحذف قناة من العرض
+function removeRequiredChannel(index) {
+    const containers = document.querySelectorAll('[data-index]');
+    const targetContainer = Array.from(containers).find(el => el.dataset.index == index);
+    if (targetContainer) {
+        const parent = targetContainer.closest('div[style*="background"]');
+        if (parent) {
+            parent.remove();
+        }
+    }
+}
+
+// ✅ دالة لحفظ القنوات المعدلة — مُصلحة لاستهداف حقول القنوات فقط
+async function saveRequiredChannels() {
+    const resultDiv = document.getElementById('channelsResult');
+    resultDiv.innerHTML = '<p class="loading">جارٍ حفظ القنوات...</p>';
+
+    // ✅ جمع بيانات القنوات من الحقول — فقط داخل #channelsContainer
+    const channelContainers = document.querySelectorAll('#channelsContainer > div[style*="background"]');
+    const channels = [];
+    let hasError = false;
+
+    channelContainers.forEach(container => {
+        const index = container.querySelector('[data-field="url"]')?.dataset.index;
+        if (!index) return; // تجاهل إذا لم يُعثر على index
+
+        const urlInput = document.querySelector(`[data-field="url"][data-index="${index}"]`);
+        const titleInput = document.querySelector(`[data-field="title"][data-index="${index}"]`);
+        const descInput = document.querySelector(`[data-field="description"][data-index="${index}"]`);
+
+        if (urlInput && titleInput && urlInput.value.trim() && titleInput.value.trim()) {
+            channels.push({
+                url: urlInput.value.trim(),
+                title: titleInput.value.trim(),
+                description: descInput?.value.trim() || ''
+            });
+        } else {
+            hasError = true;
+        }
+    });
+
+    if (hasError || channels.length === 0) {
+        resultDiv.innerHTML = '<p style="color: red;">❌ يجب ملء رابط وعنوان كل قناة. لا يمكن أن تكون القائمة فارغة.</p>';
+        return;
+    }
+
+    try {
+        // جلب الإعدادات الحالية أولاً
+        const currentSettings = await fetch('/settings').then(r => r.json());
+
+        // إنشاء كائن إعدادات جديد
+        const newSettings = {
+            ...currentSettings,
+            REQUIRED_CHANNELS: channels
+        };
+
+        // إرسال التحديث للخادم
+        const response = await fetch(`${API_BASE}/admin/update-settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: 6434711549,
+                ...newSettings
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            resultDiv.innerHTML = '<p style="color: green;">✅ تم حفظ القنوات الإجبارية بنجاح!</p>';
+            // إعادة تحميل القنوات لعرض التغييرات
+            loadRequiredChannels();
+        } else {
+            resultDiv.innerHTML = `<p style="color: red;">❌ فشل الحفظ: ${data.error}</p>`;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ خطأ في الاتصال بالخادم.</p>`;
+        console.error('Error saving required channels:', error);
+    }
+}
+
+
+  </script>
+      <!-- ✅ قسم تعديل الإعدادات -->
+    <div id="settings-section" class="action-section">
+      <h2><i class="fas fa-cog"></i> تعديل إعدادات النظام</h2>
+      <div>
+        <label for="minWithdrawal">الحد الأدنى للسحب (CMD):</label>
+        <input type="number" id="minWithdrawal" placeholder="مثال: 15">
+      </div>
+      <h3 style="margin-top: 30px;">وسائل الدفع (يمكنك حذف أو تعديل أي وسيلة)</h3>
+      <div id="paymentMethodsContainer">
+        <!-- سيتم تحميل وسائل الدفع هنا ديناميكيًا -->
+        <p class="loading">جارٍ تحميل وسائل الدفع...</p>
+      </div>
+      <button onclick="addPaymentMethod()" style="margin-top: 15px; background: #28a745;"><i class="fas fa-plus"></i> إضافة وسيلة دفع جديدة</button>
+      <button onclick="saveSettings()" style="margin-top: 20px; background: #007bff;"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+      <div id="settingsResult"></div>
+    </div>
+
+    <!-- ✅ قسم حذف مهمة -->
+    <div id="delete-task-section" class="action-section">
+      <h2><i class="fas fa-trash"></i> حذف مهمة</h2>
+      <div>
+        <label for="taskIdToDelete">اختر المهمة للحذف:</label>
+        <select id="taskIdToDelete">
+          <option value="">-- جاري التحميل --</option>
+        </select>
+      </div>
+      <button onclick="deleteTask()" style="margin-top: 15px; background: #dc3545;"><i class="fas fa-trash"></i> حذف المهمة</button>
+      <div id="deleteTaskResult"></div>
+    </div>
+
+    <!-- ✅ قسم إدارة القنوات الإجبارية -->
+    <div id="required-channels-section" class="action-section">
+      <h2><i class="fas fa-hashtag"></i> إدارة القنوات الإجبارية</h2>
+      <p>يمكنك إضافة أو حذف أو تعديل القنوات التي يجب على المستخدمين الاشتراك فيها قبل استخدام التطبيق.</p>
+      <div id="channelsContainer">
+        <!-- سيتم تحميل القنوات هنا ديناميكيًا -->
+        <p class="loading">جارٍ تحميل القنوات...</p>
+      </div>
+      <button onclick="addRequiredChannel()" style="margin-top: 15px; background: #28a745;"><i class="fas fa-plus"></i> إضافة قناة جديدة</button>
+      <button onclick="saveRequiredChannels()" style="margin-top: 20px; background: #007bff;"><i class="fas fa-save"></i> حفظ التغييرات</button>
+      <div id="channelsResult"></div>
+    </div>
+
+
+    <!-- ✅ قسم تدقيق الإحالات -->
+<div id="audit-section" class="action-section">
+  <h2><i class="fas fa-search"></i> تدقيق الإحالات ومعاقبة المخالفين</h2>
+  <p>هذه العملية ستتحقق من جميع المستخدمين المدعوين. إذا كان أحدهم غير مشترك في القنوات الإجبارية، سيتم خصم 1 من عدد دعوات الداعي و3 من رصيده.</p>
+  <button onclick="startAudit()" style="background: #ffc107;"><i class="fas fa-play"></i> بدء التدقيق الآن</button>
+  <div id="auditResult"></div>
+</div>
+</body>
+</html>

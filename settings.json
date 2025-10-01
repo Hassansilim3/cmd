@@ -1,0 +1,69 @@
+{
+  "MIN_WITHDRAWAL": 40,
+  "REQUIRED_CHANNELS": [
+    {
+      "url": "https://t.me/Commando_chat",
+      "title": "جروب المناقشة",
+      "description": "تواصل مع بقية المستخدمين وتفاعل معهم"
+    },
+    {
+      "url": "https://t.me/COMMANDO_CRYPTO",
+      "title": "COMMAND CRYPTO",
+      "description": "قناة البوت الرسمية"
+    },
+    {
+      "url": "https://t.me/Commandotr",
+      "title": "Commando training",
+      "description": "قناة تداول بيانري"
+    },
+    {
+      "url": "https://t.me/Commandoforex",
+      "title": "Commando  FOREX",
+      "description": "قناو تداول فوركس توصيات"
+    }
+  ],
+  "PAYMENT_METHODS": [
+    {
+      "id": "ton",
+      "name": "محفظة TON",
+      "icon": "https://static.vecteezy.com/system/resources/thumbnails/024/093/451/small/toncoin-ton-glass-crypto-coin-3d-illustration-free-png.png",
+      "category": "digital"
+    },
+    {
+      "id": "usdt",
+      "name": "USDT (TON)",
+      "icon": "https://www.svgrepo.com/show/367256/usdt.svg",
+      "category": "digital"
+    },
+    {
+      "id": "binance",
+      "name": "Binance",
+      "icon": "https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/binance-app-icon.png",
+      "category": "exchange"
+    },
+    {
+      "id": "vodafone",
+      "name": "فودافون كاش",
+      "icon": "https://cdn4.iconfinder.com/data/icons/flat-brand-logo-2/512/vodafone-512.png",
+      "category": "local"
+    },
+    {
+      "id": "orange",
+      "name": "أورانج كاش",
+      "icon": "https://f.top4top.io/p_3537v4t2b1.png",
+      "category": "local"
+    },
+    {
+      "id": "egmoney",
+      "name": "EG Money",
+      "icon": "fas fa-money-bill-wave",
+      "category": "local"
+    },
+    {
+      "id": "userrrr",
+      "name": "أعضاء قناة",
+      "icon": "https://i.ibb.co/rKvr0bKt/add-user-vector-icon.png",
+      "category": "local"
+    }
+  ]
+}
